@@ -7,7 +7,7 @@ This is a static app. No npm install, build command, API key, or backend is need
    Choose Public for free GitHub Pages hosting and enable Add README.
 3. In the repository, select Add file > Upload files.
 4. Upload the extracted files directly to the repository root:
-   index.html, styles.css, app.js, vocab.json, icon.svg, README.md, and .nojekyll.
+   index.html, styles.css, app.js, vocab.json, examples.json, icon.svg, README.md, and .nojekyll.
    Do not upload the ZIP or put index.html inside an extra folder.
    .nojekyll may be hidden in your file manager; it is included as a convenience.
 5. Commit the files to main.
@@ -33,6 +33,22 @@ Progress does not transfer automatically between domains or devices.
 990 words and definitions/examples from the supplied PDF plus 10 marked bonus words.
 Includes study cards, pronunciation via browser speech synthesis, batch quizzes,
 daily challenges, review scheduling, search, and progress backup/restore.
+
+## New in this update
+
+- Previous and Next controls on study cards, review cards, and quiz questions.
+- Open any word as a review card and browse the complete filtered list.
+- Previous/Next pagination for the word bank and long review lists.
+- Backtracking preserves answered questions and never counts an answer twice.
+- You can skip a quiz question and return to it; all questions must be answered before finishing.
+- 1,000 newly written example templates with 576 named scenario variations per word.
+- Review sessions automatically use fresh sentence variations.
+- New sentence buttons on review examples and revealed cards.
+- Original PDF examples remain available separately.
+- Sentence variations run entirely in your browser, without an API key or a server.
+
+Existing saved progress remains compatible. Upload ALL app files in this update,
+including the NEW examples.json. Keep the filenames and root folder arrangement.
 
 ## Updating
 
