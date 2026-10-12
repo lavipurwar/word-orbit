@@ -1,24 +1,10 @@
-# Word Orbit — GitHub Pages setup
+# Word Orbit
 
 This is a static app. No npm install, build command, API key, or backend is needed.
 
-1. Extract this ZIP.
-2. Visit https://github.com/new and create a repository named word-orbit.
-   Choose Public for free GitHub Pages hosting and enable Add README.
-3. In the repository, select Add file > Upload files.
-4. Upload the extracted files directly to the repository root:
-   index.html, styles.css, app.js, vocab.json, examples.json, icon.svg, README.md, and .nojekyll.
-   Do not upload the ZIP or put index.html inside an extra folder.
-   .nojekyll may be hidden in your file manager; it is included as a convenience.
-5. Commit the files to main.
-6. Open Settings > Pages. Under Build and deployment, select:
-   Source: Deploy from a branch
-   Branch: main
-   Folder: /(root)
-   Click Save.
-7. Wait for deployment and use the live URL shown in Settings > Pages:
-   https://YOUR-USERNAME.github.io/word-orbit/
-   It can take up to 10 minutes. If it fails, inspect the Actions tab.
+10 days, 100 words each, 5 batches of 20 per day.
+Includes study cards, pronunciation via browser speech synthesis, batch quizzes,
+daily challenges, review scheduling, search, and progress backup/restore.
 
 ## Progress and moving to this version
 
@@ -27,12 +13,6 @@ Before switching, click Export progress at the bottom of the original app.
 On the GitHub-hosted app, use Restore backup and select the downloaded JSON.
 Progress does not transfer automatically between domains or devices.
 
-## App content
-
-10 days, 100 words each, 5 batches of 20 per day.
-990 words and definitions/examples from the supplied PDF plus 10 marked bonus words.
-Includes study cards, pronunciation via browser speech synthesis, batch quizzes,
-daily challenges, review scheduling, search, and progress backup/restore.
 
 ## New in this update
 
@@ -44,7 +24,6 @@ daily challenges, review scheduling, search, and progress backup/restore.
 - 1,000 newly written example templates with 576 named scenario variations per word.
 - Review sessions automatically use fresh sentence variations.
 - New sentence buttons on review examples and revealed cards.
-- Original PDF examples remain available separately.
 - Sentence variations run entirely in your browser, without an API key or a server.
 
 Existing saved progress remains compatible. Upload ALL app files in this update,
