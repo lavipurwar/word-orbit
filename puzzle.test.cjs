@@ -17,6 +17,33 @@ g=p.create();for(let i=0;i<50;i++)p.earn(g);assert.equal(g.pieces.length,50);
 assert.equal(p.restore(JSON.parse(JSON.stringify(g))).pieces.length,50,'Backup round trip');
 assert.equal(p.restore({board:[]}).board.length,64,'Invalid backup resets puzzle safely');
 assert.equal(p.restore(undefined).score,0,'Old progress remains compatible');
+assert.equal(p.shapes.length,24,'Expanded shape library');
+assert.ok(new Set(p.shapes.map(s=>s.color)).size>=8,'Distinct block colors');
+for(let i=0;i<p.shapes.length;i++){
+  const game=p.create();game.pieces=[i];const move=p.place(game,0,0);
+  assert.ok(move,'Every shape fits an empty board');
+  assert.equal(game.board.filter(Boolean).length,p.shapes[i].cells.length);
+  assert.ok(move.placedCells.every(j=>game.colors[j]===p.shapes[i].color),'Placed blocks retain their shape color');
+  const restored=p.restore(JSON.parse(JSON.stringify(game)));
+  assert.deepEqual([...restored.colors],[...game.colors],'Colors survive backup round trip');
+}
+let comboGame=p.create();
+function clearRow(game){for(let i=0;i<7;i++)game.board[i]=1;game.pieces=[0];return p.place(game,0,7);}
+assert.equal(clearRow(comboGame).points,110);
+assert.equal(clearRow(comboGame).points,210,'Second clear doubles line bonus');
+comboGame.pieces=[0,0];p.place(comboGame,0,16);p.place(comboGame,0,18);
+assert.equal(clearRow(comboGame).combo,3,'Two non-clearing moves preserve combo');
+comboGame.pieces=[0,0,0];p.place(comboGame,0,24);p.place(comboGame,0,26);p.place(comboGame,0,28);
+assert.equal(comboGame.combo,0,'Three non-clearing moves reset combo');
+assert.equal(clearRow(comboGame).combo,1);
+const oldBest=comboGame.best;p.reset(comboGame);assert.equal(comboGame.best,oldBest);assert.equal(comboGame.combo,0);assert.ok(comboGame.colors.every(c=>c===null));
+const hintGame=p.create();hintGame.board.fill(1,0,7);hintGame.pieces=[0];
+const beforeHint=JSON.stringify(hintGame),suggestion=p.hint(hintGame,0);
+assert.equal(suggestion.index,7);assert.equal(suggestion.lines,1);
+assert.equal(JSON.stringify(hintGame),beforeHint,'Preview and hint never mutate gameplay');
+const tight=p.create();tight.board.fill(1);tight.board[63]=0;
+for(let i=0;i<30;i++){p.earn(tight);assert.equal(tight.pieces.at(-1),0,'Only a fitting shape is earned when space is tight');}
+assert.equal(p.restore({...tight,colors:Array(64).fill('url(evil)')}).colors[0],p.palette[2],'Unrecognized saved colors are replaced');
 
 // Exercise reward integration with the real answer handler and vocabulary data.
 const app=fs.readFileSync('app.js','utf8'),ui=fs.readFileSync('puzzle-ui.js','utf8');

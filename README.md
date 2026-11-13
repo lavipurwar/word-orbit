@@ -11,7 +11,14 @@ mouse, or pen. A green preview shows a valid drop; red shows a blocked placement
 On touch screens the piece lifts above your finger so the target stays visible.
 Invalid drops return the piece to the tray. Drag near a screen edge to scroll;
 swipe outside a piece to scroll normally. Pieces do not rotate. Complete rows and
-columns clear together: earn 10 points per placed square and 100 per cleared line.
+columns clear together: earn 10 points per placed square and 100 per cleared line
+times your combo multiplier. Each clearing move increases the combo; three moves
+without clearing reset it. The tray has 24 shapes in eight colors, including long
+lines, rectangles, large squares, and mirrored corners. New rewards prefer shapes
+that fit the current board, with recent repeats avoided when possible. Existing
+earned pieces keep their original shapes. Hover or drag to preview a move and
+highlight the lines it would clear. Use “Show a move” for a hint with the selected
+piece; hints prefer line clears and do not spend blocks or points.
 Successful placements play a snap chime; invalid drops play a soft low tone.
 Line clears play a rising chime and show a blast celebration, with an extra
 all-clear message when the board empties. Sound on/off is saved with progress.

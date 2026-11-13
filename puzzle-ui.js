@@ -39,7 +39,7 @@ function puzzlePlacementFeedback(placed){
   document.querySelector('.puzzle-stats')?.animate?.([{transform:'scale(1)'},{transform:'scale(1.05)'},{transform:'scale(1)'}],{duration:350});
   if(placed.lines){
     const celebration=document.createElement('div');celebration.className='puzzle-celebration';celebration.setAttribute('aria-hidden','true');
-    celebration.textContent=placed.boardEmpty?'✦ All clear!':placed.lines>1?`✦ ${placed.lines}-line blast!`:'✦ Line cleared!';board.appendChild(celebration);
+    celebration.textContent=placed.boardEmpty?'✦ All clear!':placed.combo>1?`✦ Combo ×${placed.combo}!`:placed.lines>1?`✦ ${placed.lines}-line blast!`:'✦ Line cleared!';board.appendChild(celebration);
     const animation=celebration.animate?.([{opacity:0,transform:'translate(-50%,-20%) scale(.6)'},{opacity:1,transform:'translate(-50%,-50%) scale(1)',offset:.2},{opacity:1,transform:'translate(-50%,-65%) scale(1)',offset:.75},{opacity:0,transform:'translate(-50%,-100%) scale(1.1)'}],{duration:1100});
     if(animation)animation.onfinish=()=>celebration.remove();else celebration.remove();
   }
@@ -63,6 +63,7 @@ render=function(){
   const instructions=document.querySelector('.puzzle-panel > .sub');
   if(instructions)instructions.textContent='Each correct quiz answer earns one piece. Drag a piece onto the board, or tap a piece then its top-left square. Green means it fits; red means try another space. Complete rows or columns to clear them.';
   document.querySelector('.puzzle-heading')?.insertAdjacentHTML('beforeend',`<button class="btn secondary" data-action="puzzleSound" aria-pressed="${g.sound}" aria-label="Puzzle sound effects">Sound ${g.sound?'on ♫':'off'}</button>`);
+  decoratePuzzle(g);
   const q=view==='quiz'&&quiz?.questions[quiz.index];
   if(q&&q.answer===q.w.id)document.querySelector('.feedback')?.insertAdjacentHTML('beforeend',`<p class="puzzle-reward">✦ Correct! One puzzle piece earned.</p><button class="btn secondary" data-action="puzzle">Play Blocky Blast · ${g.pieces.length} pieces ready</button>`);
 };
@@ -78,6 +79,12 @@ answer=function(id){
 };
 document.addEventListener('click',e=>{
   const b=e.target.closest('button');if(!b)return;
+  if(b.dataset.action==='puzzleHint'){
+    const hint=BlockyPuzzle.hint(state.puzzle,puzzleSelection);
+    const message=document.querySelector('.puzzle-message');
+    message.textContent=hint?`Try row ${Math.floor(hint.index/8)+1}, column ${hint.index%8+1}.${hint.lines?' This clears '+hint.lines+' line(s)!':''}`:'This piece cannot fit. Try another earned piece or start a fresh board.';
+    if(hint){showPuzzlePreview(state.puzzle.pieces[puzzleSelection],hint.index);document.querySelector(`[data-puzzle-cell="${hint.index}"]`)?.focus();}return;
+  }
   if(b.dataset.action==='puzzleSound'){
     state.puzzle.sound=!state.puzzle.sound;if(puzzleAudio&&!state.puzzle.sound)puzzleAudio.gain.gain.value=0;
     save();render();if(state.puzzle.sound)playPuzzleSound('snap');document.querySelector('[data-action="puzzleSound"]')?.focus();return;
@@ -97,7 +104,7 @@ document.addEventListener('click',e=>{
     if(placed)save();render();puzzlePlacementFeedback(placed);document.querySelector(`[data-puzzle-cell="${b.dataset.puzzleCell}"]:not(:disabled), [data-puzzle-piece]`)?.focus();
   }
   if(b.dataset.action==='resetPuzzle'&&confirm('Start a fresh board? This round’s points reset; your best score and unused pieces stay.')){
-    state.puzzle.board.fill(0);state.puzzle.score=0;puzzleMessage='Fresh board ready.';save();render();document.getElementById('puzzle-title').focus();
+    BlockyPuzzle.reset(state.puzzle);puzzleMessage='Fresh board ready.';save();render();document.getElementById('puzzle-title').focus();
   }
 });
 
@@ -107,7 +114,7 @@ function cancelPuzzleDrag(){
   const d=puzzleDrag;puzzleDrag=null;
   cancelAnimationFrame(d.frame);
   d.ghost?.remove();
-  document.querySelectorAll('.puzzle-cell.drop-valid,.puzzle-cell.drop-invalid').forEach(c=>c.classList.remove('drop-valid','drop-invalid'));
+  clearPuzzlePreview();
   d.source.classList.remove('dragging');
   if(d.source.hasPointerCapture(d.id))d.source.releasePointerCapture(d.id);
 }
@@ -122,15 +129,12 @@ function updatePuzzleDrag(){
   d.ghost.style.left=(x-first.width/2)+'px';d.ghost.style.top=(y-first.height/2)+'px';
   d.ghost.style.setProperty('--drag-cell',first.width+'px');
   d.ghost.style.setProperty('--drag-gap',(pitch-first.width)+'px');
+  d.ghost.style.setProperty('--block-color',BlockyPuzzle.shapes[state.puzzle.pieces[d.selection]].color);
   const col=Math.round((x-first.left-first.width/2)/pitch),row=Math.round((y-first.top-first.height/2)/pitch);
   d.index=row>=0&&row<8&&col>=0&&col<8?row*8+col:null;
-  const shape=BlockyPuzzle.shapes[state.puzzle.pieces[d.selection]];
   d.valid=d.index!==null&&!!BlockyPuzzle.fits(state.puzzle,state.puzzle.pieces[d.selection],d.index);
   d.ghost.classList.toggle('invalid',!d.valid);
-  cells.forEach(c=>c.classList.remove('drop-valid','drop-invalid'));
-  if(d.index!==null)for(const [r,c] of shape.cells){
-    if(row+r<8&&col+c<8)cells[(row+r)*8+col+c].classList.add(d.valid?'drop-valid':'drop-invalid');
-  }
+  showPuzzlePreview(state.puzzle.pieces[d.selection],d.index);
 }
 function scrollPuzzleDrag(){
   const d=puzzleDrag;if(!d?.active)return;
@@ -177,3 +181,39 @@ document.addEventListener('lostpointercapture',e=>{
 document.addEventListener('click',e=>{
   if(performance.now()<puzzleSuppressClickUntil&&e.target.closest('.puzzle-panel')){e.preventDefault();e.stopImmediatePropagation();}
 },true);
+
+function decoratePuzzle(g){
+  document.querySelectorAll('[data-puzzle-cell]').forEach((cell,i)=>{
+    cell.style.setProperty('--block-color',g.colors[i]||'#af7bff');
+    // Empty corners in a shape may legitimately overlap an occupied anchor.
+    cell.disabled=!g.pieces.length;
+  });
+  document.querySelectorAll('[data-puzzle-piece]').forEach(piece=>{
+    const p=g.pieces[Number(piece.dataset.puzzlePiece)];
+    piece.style.setProperty('--block-color',BlockyPuzzle.shapes[p].color);
+    const fits=BlockyPuzzle.canFit(g,p);piece.classList.toggle('no-fit',!fits);
+    piece.title=fits?'Drag onto the board or tap to select':'No space for this shape yet. Clear space with another piece.';
+  });
+  document.querySelector('.puzzle-stats')?.insertAdjacentHTML('beforeend',`<span class="combo-stat"><strong>×${g.combo||1}</strong> ${g.combo?'combo · '+(3-g.movesSinceClear)+' moves left':'clear to start a combo'}</span>`);
+  const description=document.querySelector('.puzzle-inventory > .sub');
+  if(description)description.textContent='24 colorful shapes · 10 points per square. Clear lines for 100 points each × your combo. A clear grows the combo; 3 moves without a clear reset it.';
+  document.querySelector('.puzzle-inventory h3')?.insertAdjacentHTML('afterend',`<button class="shortcut" data-action="puzzleHint" ${g.pieces.length?'':'disabled'}>✦ Show a move for selected piece</button>`);
+}
+function clearPuzzlePreview(){
+  document.querySelectorAll('[data-puzzle-cell]').forEach(c=>{c.classList.remove('drop-valid','drop-invalid','blast-preview');c.style.setProperty('--preview-color','transparent');});
+}
+function showPuzzlePreview(p,index){
+  clearPuzzlePreview();if(index===null||!BlockyPuzzle.shapes[p])return;
+  const move=BlockyPuzzle.inspect(state.puzzle,p,index),row=Math.floor(index/8),col=index%8;
+  for(const [r,c] of BlockyPuzzle.shapes[p].cells){
+    if(row+r<8&&col+c<8){const cell=document.querySelector?.(`[data-puzzle-cell="${(row+r)*8+col+c}"]`);cell?.classList.add(move?'drop-valid':'drop-invalid');cell?.style.setProperty('--preview-color',BlockyPuzzle.shapes[p].color);}
+  }
+  if(move)for(const i of move.clearedCells)document.querySelector?.(`[data-puzzle-cell="${i}"]`)?.classList.add('blast-preview');
+}
+document.addEventListener('pointerover',e=>{
+  if(puzzleDrag||e.pointerType==='touch')return;
+  const cell=e.target.closest('[data-puzzle-cell]');if(cell)showPuzzlePreview(state.puzzle.pieces[puzzleSelection],Number(cell.dataset.puzzleCell));
+});
+document.addEventListener('pointerout',e=>{
+  if(!puzzleDrag&&e.target.closest('[data-puzzle-cell]'))clearPuzzlePreview();
+});
