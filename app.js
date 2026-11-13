@@ -94,7 +94,7 @@ document.addEventListener('click',e=>{
  }
 });
 document.addEventListener('keydown',e=>{
- if(e.target.matches('input,select,textarea')||e.target.closest('details'))return;
+ if(e.target.matches('input,select,textarea')||e.target.closest('details,.puzzle-panel,.puzzle-launch')||e.target.dataset.action==='puzzle')return;
  if(view==='study'){
   if(e.code==='Space'){e.preventDefault();if(!session.flipped){session.flipped=true;render();}}
   else if(e.key==='ArrowLeft'){e.preventDefault();moveWord(-1);}
