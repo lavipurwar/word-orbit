@@ -2,37 +2,11 @@
 
 This is a static app. No npm install, build command, API key, or backend is needed.
 
-## Blocky Blast Puzzle
+## Badges
 
-Each correct quiz answer earns one puzzle piece. Open Blocky Blast from the
-quiz feedback or the button above any page. Select an earned piece, then select
-its top-left square on the 8×8 board. You can also drag pieces with a finger,
-mouse, or pen. A green preview shows a valid drop; red shows a blocked placement.
-On touch screens the piece lifts above your finger so the target stays visible.
-Invalid drops return the piece to the tray. Drag near a screen edge to scroll;
-swipe outside a piece to scroll normally. Pieces do not rotate. Complete rows and
-columns clear together: earn 10 points per placed square and 100 per cleared line
-times your combo multiplier. Each clearing move increases the combo; three moves
-without clearing reset it. The tray has 24 shapes in eight colors, including long
-lines, rectangles, large squares, and mirrored corners. New rewards prefer shapes
-that fit the current board, with recent repeats avoided when possible. Existing
-earned pieces keep their original shapes. Hover or drag to preview a move and
-highlight the lines it would clear. Use “Show a move” for a hint with the selected
-piece; hints prefer line clears and do not spend blocks or points.
-Successful placements play a snap chime; invalid drops play a soft low tone.
-Line clears play a rising chime and show a blast celebration, with an extra
-all-clear message when the board empties. Sound on/off is saved with progress.
-Sounds are generated locally in the browser; no audio downloads are needed.
-Animations respect the device's reduced-motion preference.
-Return to learning at any time without leaving the current quiz question.
-
-The board, unused pieces, round score, and best score save with vocabulary
-progress and are included in progress backups. Older backups start with an empty
-puzzle. A fresh board resets the round score but keeps unused pieces and the best
-score. Revisiting an answered question cannot earn another piece.
-
-Publish `puzzle.js`, `puzzle-ui.js`, and `puzzle.css` alongside the existing files.
-Run the puzzle checks with `node puzzle.test.cjs`.
+Earn Perfect Orbit with a 20/20 quiz score. Practice on 3, 7, 14, or 30
+consecutive days to earn streak badges. Finish a quiz or mark a flashcard
+to count a practice day. Open Badges to see your awards and streaks.
 
 10 days, 100 words each, 5 batches of 20 per day.
 Includes study cards, pronunciation via browser speech synthesis, batch quizzes,
